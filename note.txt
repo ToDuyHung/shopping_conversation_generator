@@ -1,0 +1,45 @@
+User cung cấp hình ảnh:
+inform(image)
+nhận dạng, tìm kiếm..
+existed
+
+
+chat với NV: chat_emp
+
+
+yêu cầu thông tin sản phẩm": info_product
+
+đặt hàng: order_
+
+kết thúc cuộc hội thoại: end
+
+
+
+
+"order_": {
+        "hello": ["hello", "order"],
+        "order": ["id_product"],
+        "id_product": ["inform_id", "size_product"],
+        "inform_id": ["id_product"],
+
+        "size_product": ["inform_size", "color_product"],
+        "inform_size": ["size_product"],
+
+        "color_product": ["inform_color","amount_product"],
+        "inform_color": ["color_product"],
+
+        "amount_product": ["inform_amount", "ok_1"],
+        "inform_amount": ["amount_product"],
+
+        "ok_1": ["id_member"],
+        "id_member": ["request_id", "phone_member"],
+        "request_id": ["id_member"],
+
+        "phone_member": ["request_phone", "addr_member"],
+        "request_phone": ["phone_member"],
+
+        "addr_member": ["request_addr", "ok_2"],
+        "request_addr": ["addr_member"],
+
+        "ok_2": ["end"]
+    }

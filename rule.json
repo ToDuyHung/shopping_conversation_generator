@@ -1,0 +1,29 @@
+{
+    "user_image": {
+        "inform_img": ["id_product"],
+        "id_product": ["existed"],
+        "existed": ["reject", "ok", "chat_emp"],
+        "reject": ["chat_emp"],
+        "ok": ["info_product"]
+    },
+    "info_product": {
+        "hello": ["hello", "request"],
+        "request": ["id_product"],
+        "id_product": ["order_", "info_product", "inform_Y", "done"],
+        "done": ["end"],
+        "inform_Y": ["id_product"]
+    },
+    "chat_emp": {
+        "hello": ["hello", "connect"],
+        "connect": ["end"]
+    },
+    "order_": {
+        "hello": ["hello", "order"],
+        "order": ["ok_1"],
+        
+
+        "ok_1": ["ok_2"],
+
+        "ok_2": ["end"]
+    }
+}
