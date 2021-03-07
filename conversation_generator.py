@@ -6,10 +6,14 @@ import pandas as pd
 import csv
 import random
 import sys
-df_172 = pd.read_csv('172.csv')
-df_173 = pd.read_csv('173.csv')
-df_174 = pd.read_csv('174.csv')
+# df_172 = pd.read_csv('172.csv')
+# df_173 = pd.read_csv('173.csv')
+# df_174 = pd.read_csv('174.csv')
 df_175 = pd.read_csv('175.csv')
+
+
+def FilterListText(ls_text):
+    return [ele[ele.index(':')+2:] if ':' in ele else ele for ele in ls_text]
 
 ls_of_ls = []
 
@@ -115,6 +119,23 @@ ls_of_ls += [[ele[1:-1] if '"' in ele else ele for ele in normalized_ls_amount]]
 # print(normalized_ls_color)
 
 
+# 15 "Id member"
+df_Id_member = pd.concat([ele['Id member'].dropna(axis=0) for ele in [df_175]])
+normalized_ls_Id_mem = list(df_Id_member)
+ls_of_ls += [[ele[1:-1] if '"' in ele else ele for ele in normalized_ls_Id_mem]]
+
+
+
+# 16 "phone member"
+df_phone_member = pd.concat([ele['phone member'].dropna(axis=0) for ele in [df_175]])
+normalized_ls_phone_mem = list(df_phone_member)
+ls_of_ls += [[ele[1:-1] if '"' in ele else ele for ele in normalized_ls_phone_mem]]
+
+#  17 "addr member"
+df_addr_member = pd.concat([ele['addr member'].dropna(axis=0) for ele in [df_175]])
+normalized_ls_addr_mem = list(df_addr_member)
+ls_of_ls += [[ele[1:-1] if '"' in ele else ele for ele in normalized_ls_addr_mem]]
+
 
 # Get request cover Id_product
 df_request_id_product = pd.concat([ele[['Request', 'ID_product']].dropna(axis=0) for ele in [df_175]])
@@ -130,16 +151,29 @@ df_Order_summary = df_Order_summary[df_Order_summary['Request'] != '']
 
 
 ls_Request = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_Order_summary['Request'])]
-ls_ID_product = list(df_Order_summary['ID_product'])
-ls_size_product = list(df_Order_summary['size_product'])
-ls_color_product = list(df_Order_summary['color_product'])
-ls_amount_product = list(df_Order_summary['amount_product'])
+ls_ID_product = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_Order_summary['ID_product'])]
+ls_size_product = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_Order_summary['size_product'])]
+ls_color_product = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_Order_summary['color_product'])]
+ls_amount_product = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_Order_summary['amount_product'])]
 # print(len(ls_Request))
 # print(len(ls_ID_product))
 # print(len(ls_amount_product))
 # print(ls_Request[-1])
 # print(ls_ID_product[-1])
 # print(ls_amount_product[-1])
+
+
+
+df_InfoMember_summary = pd.concat([ele[['Inform', 'Id member', 'phone member','addr member']] for ele in [df_175]])
+df_InfoMember_summary.fillna('', inplace = True)
+df_InfoMember_summary = df_InfoMember_summary[df_InfoMember_summary['Inform'] != '']
+
+
+
+ls_InfoMember = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_InfoMember_summary['Inform'])]
+ls_ID_member = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_InfoMember_summary['Id member'])]
+ls_phone_member = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_InfoMember_summary['phone member'])]
+ls_addr_member = [ele[ele.index(':')+2:] if ':' in ele else ele for ele in list(df_InfoMember_summary['addr member'])]
 
 
 def find_first_state(start):
@@ -170,6 +204,10 @@ def sentence_generator(state):
         ls = ls_of_ls[10]
     elif state == 'order':
         ls = ls_Request
+    elif state == 'ok_1':
+        ls = ls_InfoMember
+    elif state == 'ok_2':
+        ls = ['Cam on ban da dat hang', 'Shop xin cam on. Chuc ban mot ngay tot lanh', 'Cam on quy khach']
     else:
         # print('----', state)
         ls = [state]
@@ -177,74 +215,123 @@ def sentence_generator(state):
 
 with open('rule.json', 'rb') as json_data:
     rules = json.loads(json_data.read())
-    # print(len(rules), "rules loaded succesfully")
-    # print(rules)
-
-    # User cung cap hinh anh: start from inform_img
     
     start = ''
     # state = 'user_image'
-    state = 'order_'
+    
 
-    while(True):
+    with open('order_conversation.rtf', 'w') as file:
+        writer = csv.writer(file)
+
+        for i in range(500):
+            
+            state = 'order_'
+
+            writer.writerow(['Conversation: ' + str(i)])
+
+            while(True):
+                
+                if state in rules:
+                    start = state
+                    state = find_first_state(start)
+                    # print("hi")
+                    if len(state) == 1:
+                        state = state[0]
+                    else:
+                        state = random.choice(state)
+
+
+                if state == "end":
+                    break
+                
+                list_sentence = sentence_generator(state)
+                
+
+                if state == 'order':
+                    tmp = random.choice(range(len(list_sentence)))
+                    id_pro = ls_ID_product[tmp]
+                    size_pro = ls_size_product[tmp]
+                    color_pro = ls_color_product[tmp]
+                    amount_pro = ls_amount_product[tmp]
+                    writer.writerow(['Khach: ' + list_sentence[tmp]])
+                    # print('Khach: ' + list_sentence[tmp])
+                    if id_pro == '':
+                        writer.writerow(['Shop: Da ban muon lay san pham gi a ?'])
+                        # print('Shop: Da ban muon lay san pham gi a ?')
+                        id_pro = random.choice(ls_of_ls[11])
+                        writer.writerow(['Khach: ' + id_pro])
+                        # print('Khach: ' + id_pro)
+                    if size_pro == '':
+                        writer.writerow(['Shop: Da ban muon lay size gi a ?'])
+                        # print('Shop: Da ban muon lay size gi a ?')
+                        size_pro = random.choice(ls_of_ls[12])
+                        writer.writerow(['Khach: ' + size_pro])
+                        # print('Khach: ' + size_pro)
+                    if color_pro == '':
+                        writer.writerow(['Shop: Da ban muon lay mau gi a ?'])
+                        # print('Shop: Da ban muon lay mau gi a ?')
+                        color_pro = random.choice(ls_of_ls[13])
+                        writer.writerow(['Khach: ' + color_pro])
+                        # print('Khach: ' + color_pro)
+                    if amount_pro == '':
+                        writer.writerow(['Shop: Da ban muon lay so luong nhu the nao a ?'])
+                        # print('Shop: Da ban muon lay so luong nhu the nao a ?')
+                        amount_pro = random.choice(ls_of_ls[14])
+                        writer.writerow(['Khach: ' + amount_pro])
+                        # print('Khach: ' + amount_pro)
+
+                    ########### shop confirm ##########
+                    writer.writerow(['Shop: Da, cua khach la: ' + id_pro + ' ' + size_pro + ' ' +  color_pro])
+                    # print('Shop: Da, cua khach la: ' + id_pro + ' ' + size_pro + ' ' +  color_pro)
+
+                elif state == 'ok_1':
+                    tmp = random.choice(range(len(list_sentence)))
+                    id_mem = ls_ID_member[tmp]
+                    phone_mem = ls_phone_member[tmp]
+                    addr_mem = ls_addr_member[tmp]
+
+                    inform = list_sentence[tmp]
+                    if id_mem in inform or phone_mem in inform or addr_mem in inform:
+                        writer.writerow(['Khach: ' + inform])
+                        # print('Khach: ' + inform)
+                    if id_mem == '':
+                        writer.writerow(['Shop: Cho shop xin ten khach hang voi a ?'])
+                        # print('Shop: Cho shop xin ten khach hang voi a ?')
+                        id_mem = random.choice(ls_of_ls[15])
+                        writer.writerow(['Khach: ' + id_mem])
+                        # print('Khach: ' + id_mem)
+                    if phone_mem == '':
+                        writer.writerow(['Shop: Cho shop xin sdt voi a ?'])
+                        # print('Shop: Cho shop xin sdt voi a ?')
+                        phone_mem = random.choice(ls_of_ls[16])
+                        writer.writerow(['Khach: ' + phone_mem])
+                        # print('Khach: ' + phone_mem)
+                    if addr_mem == '':
+                        writer.writerow(['Shop: Cho shop xin dia chi giao hang voi a ?'])
+                        # print('Shop: Cho shop xin dia chi giao hang voi a ?')
+                        addr_mem = random.choice(ls_of_ls[17])
+                        writer.writerow(['Khach: ' + addr_mem])
+                        # print('Khach: ' + addr_mem)
+                    
+
+                    ########### shop confirm ##########
+                    writer.writerow(['Shop: Chot don'])
+                    # print('Shop: Chot don')
+                else:
+                    writer.writerow(['Khach: ' + random.choice(list_sentence)])
+                    # print('Khach: ' + random.choice(list_sentence))
+                
+                state = rules[start][state]
+                # print(state)
         
-        if state in rules:
-            start = state
-            state = find_first_state(start)
-            # print("hi")
-            if len(state) == 1:
-                state = state[0]
-            else:
-                state = random.choice(state)
+                if state == "end":
+                    break
+                if len(state) == 1:
+                    state = state[0]
+                else:
+                    state = random.choice(state)
 
-
-        if state == "end":
-            break
-        
-        list_sentence = sentence_generator(state)
-        
-
-        if state == 'order':
-            tmp = random.choice(range(len(list_sentence)))
-            id_pro = ls_ID_product[tmp]
-            size_pro = ls_size_product[tmp]
-            color_pro = ls_color_product[tmp]
-            amount_pro = ls_amount_product[tmp]
-            print('Khach: ' + list_sentence[tmp])
-            if id_pro == '':
-                print('Shop: Da ban muon lay san pham gi a ?')
-                id_pro = random.choice(ls_of_ls[11])
-                print('Khach: ' + id_pro)
-            if size_pro == '':
-                print('Shop: Da ban muon lay size gi a ?')
-                size_pro = random.choice(ls_of_ls[12])
-                print('Khach: ' + size_pro)
-            if color_pro == '':
-                print('Shop: Da ban muon lay mau gi a ?')
-                color_pro = random.choice(ls_of_ls[13])
-                print('Khach: ' + color_pro)
-            if amount_pro == '':
-                print('Shop: Da ban muon lay so luong nhu the nao a ?')
-                amount_pro = random.choice(ls_of_ls[14])
-                print('Khach: ' + amount_pro)
-
-            ########### shop confirm ##########
-            print('Shop: Da, cua khach la: ' + id_pro + ' ' + size_pro + ' ' +  color_pro)
-
-        else:
-            print('S: ' + random.choice(list_sentence))
-        
-        state = rules[start][state]
-        # print(state)
-  
-        if state == "end":
-            break
-        if len(state) == 1:
-            state = state[0]
-        else:
-            state = random.choice(state)
-
-        print(state)
-        if state == "end":
-            break
-        
+                # print(state)
+                if state == "end":
+                    break
+                
