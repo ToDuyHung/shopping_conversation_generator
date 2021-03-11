@@ -190,7 +190,7 @@ def sentence_generator(state):
     ls = []
     if state == 'inform_img':
         # print('Customer: [Hinh anh san pham]')
-        ls = ['Customer: [Hinh anh san pham]']
+        ls = ['[Hinh anh san pham]']
     elif state == 'id_product':
         ls = ls_request_id_product
         # print('Shop: San pham [id_product] nay phai khong a ?')
@@ -220,12 +220,13 @@ with open('rule.json', 'rb') as json_data:
     # state = 'user_image'
     
 
-    with open('order_conversation.rtf', 'w') as file:
+    # with open('order_conversation.rtf', 'w') as file:
+    with open('test.rtf', 'w') as file:
         writer = csv.writer(file)
 
-        for i in range(500):
+        for i in range(1):
             
-            state = 'order_'
+            state = 'user_image'
 
             writer.writerow(['Conversation: ' + str(i)])
 
@@ -335,3 +336,6 @@ with open('rule.json', 'rb') as json_data:
                 if state == "end":
                     break
                 
+        
+
+        

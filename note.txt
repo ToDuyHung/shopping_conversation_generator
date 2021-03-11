@@ -1,45 +1,90 @@
-User cung cấp hình ảnh:
-inform(image)
-nhận dạng, tìm kiếm..
-existed
+Frame 1:
+
+User cung cấp hình ảnh: user_image
+inform(image): inform_img
+nhận dạng, tìm kiếm,...: check_id_product
+reject
+ok
+chat với nhân viên: chat_emp
 
 
-chat với NV: chat_emp
+Mục tiêu a:
 
-
-yêu cầu thông tin sản phẩm": info_product
-
-đặt hàng: order_
-
+yêu cầu thông tin sản phẩm: info_product
+hello
+request_info
+name_product ? : check_name_product
+đặt hàng: order
+done
 kết thúc cuộc hội thoại: end
 
 
+Mục tiêu b,d:
+
+yêu cầu thông tin ưu đãi, liên hệ: info_contact
+hello
+request_contact
+done
+kết thúc cuộc hội thoại: end
 
 
-"order_": {
-        "hello": ["hello", "order"],
-        "order": ["id_product"],
-        "id_product": ["inform_id", "size_product"],
-        "inform_id": ["id_product"],
+Mục tiêu c:
 
-        "size_product": ["inform_size", "color_product"],
-        "inform_size": ["size_product"],
+tư vấn size: size_recommend
+hello
+request_size
+----------
+Phần giữa check height em không tách thành 1 trạng thái riêng bởi vì các câu thoại của mình đang được tạo ra 1 cách random, nếu tách riêng trạng thái thì phần check có thể không đồng bộ với request trước đó. 
+Do đó, em hard code kiểm tra ngay trong request để đảm bảo đồng bộ về nội dung
+----------
+done
+kết thúc cuộc hội thoại: end
 
-        "color_product": ["inform_color","amount_product"],
-        "inform_color": ["color_product"],
 
-        "amount_product": ["inform_amount", "ok_1"],
-        "inform_amount": ["amount_product"],
+Mục tiêu e:
 
-        "ok_1": ["id_member"],
-        "id_member": ["request_id", "phone_member"],
-        "request_id": ["id_member"],
+Phản ánh: reflect
+hello
+feedback
+chat_emp
 
-        "phone_member": ["request_phone", "addr_member"],
-        "request_phone": ["phone_member"],
 
-        "addr_member": ["request_addr", "ok_2"],
-        "request_addr": ["addr_member"],
+Mục tiêu f:
 
-        "ok_2": ["end"]
-    }
+Chat với NV: chat_emp
+hello
+connect
+kết thúc hội thoại: end
+
+
+Mục tiêu g:
+
+đặt hàng: order
+hello
+Order request: ordering (khác với mục tiêu order)
+ok sau khi check name, size, color, amount của product: ok_1
+ok sau khi check id, phone, addr của member: ok_2
+-------------
+Tương tự trong mục tiêu c, phần check được em hard code để đảm bảo đồng bộ
+-------------
+kết thúc cuộc hội thoại: end
+
+
+Mục tiêu h:
+
+đổi hàng: change
+hello
+Change request: changing (khác với mục tiêu change)
+------ Hard code kiểm tra trong changing ----
+ok
+kết thúc cuộc hội thoại: end
+
+
+Mục tiêu i:
+
+trả hàng: return
+hello
+Return request: returning (khác với mục tiêu return)
+------- Hard code kiểm tra trong returning -----
+ok
+kết thúc cuộc hội thoại: end
